@@ -1,0 +1,11 @@
+Package: cdashQC
+Type: Package
+Title:  Quality control for TFLs
+Version: 0.1.1
+Author: Bin Zhuo
+Maintainer: Bin Zhuo <bin.zhuo@celerion.com>
+Description: Compared to version 0.1.0, this version corrected an error in the ae functions, and rewrote labshift and ae functions.
+License: What license is it under?
+LazyData: TRUE
+RoxygenNote: 5.0.1
+NeedsCompilation: no
