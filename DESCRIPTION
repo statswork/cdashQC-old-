@@ -5,7 +5,8 @@ Depends: R(>= 3.3.1)
 Imports: lubridate(>= 1.6.0), 
          reshape2(>= 1.4.1), 
          dplyr(>= 0.5.0), 
-         haven(>= 0.2.1)
+         haven(>= 0.2.1),
+         knitr(>= 1.14)
 Author: Bin Zhuo
 Maintainer: Bin Zhuo <bin.zhuo@celerion.com>
 Description: This package creates table and listings for QC of cdash format data. 

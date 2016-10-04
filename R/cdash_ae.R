@@ -88,7 +88,7 @@ create_aet <- function(ae, ex, included, improv = 99){
 #' ae1
 #'
 #' @title Create Adverse event list.
-#' @param aet  the dataset dm read from sas
+#' @param aet  the dataset created by \code{create_aet()}
 #' @return a data frame 
 #' @export
 #'
@@ -110,7 +110,7 @@ ae1 <- function(aet){
 #' ae2
 #'
 #' @title list Adverse Envent 2.
-#' @param aet the dataset dm read from sas
+#' @param aet the dataset created by \code{create_aet()}
 #' @return a data frame 
 #' @export
 #'
@@ -137,7 +137,7 @@ ae2 <- function(aet){
 #' ae3
 #'
 #' @title list Adverse Envent Non Drug Therapy.
-#' @param aet  the dataset dm read from sas
+#' @param aet  created by \code{create_aet()}
 #' @return a data frame
 #' @export
 #'
