@@ -151,7 +151,7 @@ create_lab_baseline <- function(laborig){
 # Step 3: Get the postdoes  ----------------------------------------------
 
 #' Construct postdose data
-#' @title create a baseline from lb_cq.
+#' @title create a postdose from lb_cq.
 #' @param laborig  the dataset returned by \code{clean_lb_cq()}.
 #' @return the baseline data set.
 #' @export
