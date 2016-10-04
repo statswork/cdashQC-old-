@@ -1,0 +1,10 @@
+library(devtools)
+library(roxygen2)
+# create("cdashQC")
+setwd("Y:/development/users/Zhuob01/R-template/cdash/cdashQC/")
+document()
+check()
+build(manual = T)
+setwd("..")
+install("cdashQC")
+
