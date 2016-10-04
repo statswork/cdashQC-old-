@@ -67,7 +67,7 @@ find_race <- function(dm, ex){
 #'
 #' @export
 
-w_h_bmi <- function(vs){
+weight_height_bmi <- function(vs){
 
   vs$VS_TEST[trimws(toupper(vs$VS_TEST)) == "BODY MASS INDEX"] <- "BMI"
   vs$ptno <- as.numeric(vs$CLIENTID)
@@ -124,45 +124,13 @@ get_summary <- function(var, categorical = F, name  = "race"){
 #' @param dm the dm data set
 #' @param ex the ex data set
 #' @param vs the vs data set
-#' @param bytrt  whether to summarize them by treatment, default TRUE.
-#' @return a list
-#' \item{categorical}{summary for categorical variables, such as race and gender}
-#' \item{continuous}{summary statistics for continuous variables, such as BMI and age}
+#' @return a data frame
 #' @export
 
 
-dem_summary <- function(dm, ex, vs, bytrt = F){
-  vsdm <-find_race(dm, ex) %>% inner_join(w_h_bmi(vs) , by = "ptno")
-  treatment <- unique(vsdm$EX_TRT_C)
-  result <- list()
+dem_summary <- function(dm, ex, vs){
+  vsdm <-find_race(dm, ex) %>% inner_join(weight_height_bmi(vs) , by = "ptno")
 
-
-  if (bytrt) {
-    for (i in 1:length(treatment))
-    {
-      obs <- vsdm$EX_TRT_C==treatment[i]
-      # for categorical
-      race_sum <- get_summary(vsdm$race[obs], categorical = T, name = "Race")
-      gender_sum <- get_summary(vsdm$SEX[obs], categorical = T, name = "Gender")
-
-      cat_sum <- rbind(race_sum, gender_sum)
-      # for continuous
-      bmi <- get_summary(vsdm$BMI[obs], name = "BMI")
-      height <- get_summary(vsdm$HEIGHT[obs], name = "Height")
-      weight <- get_summary(vsdm$WEIGHT[obs], name = "Weight")
-      span = time_length(interval(ymd(vsdm$BRTHDAT[obs]), ymd(vsdm$VS_DAT[obs])), "year")
-      age <- get_summary(floor(span), name = "Age")  #floor function truncate age to integer
-      continous_sum <- rbind(bmi, height, weight, age) %>%
-        melt(id ="trait", value.name = "value", variable.name = "Type")%>% arrange(trait)
-
-      res <- bind_rows(cat_sum, continous_sum)
-
-      result[[treatment[i]]] <- res
-    }
-
-  }
-
-  else {
     obs <- 1:nrow(vsdm)
     # for categorical
     race_sum <- get_summary(vsdm$race[obs], categorical = T, name = "Race")
@@ -176,13 +144,11 @@ dem_summary <- function(dm, ex, vs, bytrt = F){
     continous_sum <- rbind(bmi, height, weight, age) %>%
         melt(id ="trait", value.name = "value", variable.name = "Type")%>% arrange(trait)
 
-
     # combine for output
    result <- bind_rows(cat_sum, continous_sum)
-  }
+ 
 
-
-    return(result)
+   return(result)
 }
 
 
@@ -194,37 +160,14 @@ dem_summary <- function(dm, ex, vs, bytrt = F){
 #' @param dm the dm data set
 #' @param ex the ex data set
 #' @param vs the vs data set
-#' @param bytrt  whether to summarize them by treatment, default TRUE.
 #' @return a data frame
 #' @export
 
-dem_listing <- function(dm, ex, vs, bytrt = T){
+dem_listing <- function(dm, ex, vs){
 
-  vsdm <-find_race(dm, ex) %>% inner_join(w_h_bmi(vs) , by = "ptno")
-  treatment <- unique(vsdm$EX_TRT_C)
-
-  # variables to be displayed
-  var_select <- c("ptno", "BRTHDAT", "age", "SEX_D", "race", "ethnic", "HEIGHT", "WEIGHT", "BMI")
-  # decide the order the variables to be displayed
-  o1 <- c()
-  for(i in 1:length(var_select)) {
-    o1[i] <- which(names(vsdm)== var_select[i])
-  }
-
-  result <- list()
-
-  if (bytrt){
-    for ( k in 1:length(treatment)) {
-      res <- data.frame(vsdm[vsdm$EX_TRT_C==treatment[k], o1])
-      res <- res[order(res$ptno), ]
-      result[[treatment[k]]] <- res
-    }
-  }
-  else
-  {
-    result <- data.frame(vsdm[, o1])
-  }
-
+  vsdm <-find_race(dm, ex) %>% inner_join(weight_height_bmi(vs) , by = "ptno")
+ 
+ result <- vsdm %>% select(ptno, BRTHDAT, age, SEX_D, race, ethnic, HEIGHT, WEIGHT, BMI)
 
   return(result)
 }
