@@ -84,9 +84,10 @@ new_create_included <- function(ex, dm, cr, ds){
       base <- left_join(base %>% arrange(ptno), per_i %>% arrange(ptno),
                         by = c("ptno"))
     }
+    chkseq <- base
   }
   
-  chkseq <- base
+  
  
   chk_in <- chkseq %>% mutate(chkflg = "")
   detect <-  chk_in %>% select(starts_with("chk_in"))

@@ -29,9 +29,9 @@ create_vs <- function(vs){
   
   vs1 <- vs %>% filter(VS_TEST !="OVERALL COMMENT") %>% 
     mutate(ptno = as.numeric(CLIENTID), VS_RES_R = as.numeric(VS_RES_R)) %>%
-    select(ptno, PHOUR, PROTD, PROTH, PERIOD, DAY, HOUR, VS_TEST,
+    select(ptno, PHOUR, PERIOD, DAY, HOUR, VS_TEST,
            VS_RES_R, VS_DAT, VS_TIM, VS_POS, VS_LOC, VS_MIN, VS_RCK) %>%
-      dcast(ptno + PERIOD + PHOUR + PROTD + PROTH + DAY + HOUR + VS_DAT + VS_TIM + VS_POS
+      dcast(ptno + PERIOD + PHOUR + DAY + HOUR + VS_DAT + VS_TIM + VS_POS
             +VS_MIN + VS_LOC + VS_RCK ~ VS_TEST, value.var = "VS_RES_R" ) %>%
       arrange(ptno, VS_DAT, VS_TIM, VS_POS, VS_MIN, VS_LOC)
   

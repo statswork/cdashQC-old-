@@ -34,3 +34,4 @@ knitr::opts_chunk$set(echo = TRUE)
     + Vital Signs listing
     + ECG listing
     + Concomitant medication listing
+    + Other useful functions

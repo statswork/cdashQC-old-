@@ -1,10 +1,12 @@
 library(devtools)
 library(roxygen2)
+library(dplyr)
 # create("cdashQC")
 setwd("Y:/development/users/Zhuob01/R-template/cdash/cdashQC/")
+# 
+# devtools::use_data(CODES, internal = T)
 document()
 check()
 build(manual = T)
 setwd("..")
 install("cdashQC")
-

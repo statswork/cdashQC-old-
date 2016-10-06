@@ -45,17 +45,17 @@ cumcount <- function(vec_c)
 
 
 
-#' label variables by threshold
+#' falg variables by threshold
 #'
 #' @title label the variables of interest.
 #' @param data  the dataset to be flagged.
-#' @param threshold  a data frame returned by \code{create_threshold()}.
+#' @param thresh  a data frame returned by \code{create_threshold()}.
 #' @param included  the dataset included from sas
 #' @param oor     set to be True when flagging if a < c1 or a > c2; set to be FALSE when flagging if c1 < a < c2.
 #' @return aet the data
 #' @export
 #'
-label_var <- function(data, thresh, prefix = "flg", oor= F){
+flg_var <- function(data, thresh, prefix = "flg", oor= F){
 
   n_var <- nrow(thresh)
 
@@ -182,20 +182,21 @@ keep_non_empty <- function(data, pattern = NA, return_truncated_data = F){
 
 #' create threshold data frame
 #'
-#' @title create threshold table.
-#' @param flgvar  the variable to be flagged
+#' @title create threshold table (for flagging variable purpose).
+#' @param flagvar  the variable to be flagged
 #' @param lower   lower bound. Set to be \code{-Inf} if none.
 #' @param upper  upper bound. Set to be \code{Inf} if none.
-#' @param include_lower whether the lower bound should be included, TRUE by default
-#' @param include_upper whether the upper bound should be included, FALSE by default
+#' @param include_lower whether the lower bound should be included, \code{TRUE} by default
+#' @param include_upper whether the upper bound should be included, \code{FALSE} by default
+#' @param flg_label what label will be used to flag the variable
 #' @param add2existing  \code{TRUE} or \code{FALSE}. If \code{TRUE}, must specify thresh.
 #' @param thresh  a data frame with three columns: first column, the variable to be flagged, second column, lower bound (if any); third column, upper bound (if any).
 #' @return a data frame
 #' @export
 #' @examples
-#' a <- create_threshold(flagvar = "QTCF", lower = 0, upper = 20,, include_lower = F, include_upper = T,  flg_label = "^")
-#' b <- create_threshold(flagvar = "PR",  upper = 430, flg_label = "*", add2existing = T, thresh = a)
-#' c <- create_threshold(flagvar = "QRs",  lower = 100, flg_label = "%",add2existing = T, thresh = b)
+#' a <- create_threshold(flagvar = "QTCF", lower = 0, upper = 20, include_lower = FALSE, include_upper = TRUE,  flg_label = "^")
+#' b <- create_threshold(flagvar = "PR",  upper = 430, flg_label = "*", add2existing = TRUE, thresh = a)
+#' c <- create_threshold(flagvar = "QRs",  lower = 100, flg_label = "%",add2existing = TRUE, thresh = b)
 #' print(a); print(b);print(c);
 
 

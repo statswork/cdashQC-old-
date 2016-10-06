@@ -1,9 +1,10 @@
 #' createaet.
 #'
 #' @title do what createaet does.
-#' @param dm  the dataset dm read from sas
+#' @param ae  the dataset ae read from sas
 #' @param ex  the dataset ex read from sas
 #' @param included  the dataset included from sas
+#' @param improv the same argument as the sas macro \code{createaet()}
 #' @return aet the data
 #' @export
 #'
@@ -14,16 +15,16 @@ create_aet <- function(ae, ex, included, improv = 99){
   # pay attention to | (elementwise use of "or") and || (overall evaluation)
   ae <- ae %>% mutate( ptno = as.numeric(CLIENTID),
               AE_TERM = replace(AE_TERM, AE_TERM == "" | AE_YN == "NO", "NONE" ),      
-              ondate= parse_date_time(paste(ymd(AE_STDT), hms(AE_STTM)), "Ymd HMS", truncated = 3), 
-              redate= parse_date_time(paste(ymd(AE_ENDT), hms(AE_ENTM)), "Ymd HMS", truncated = 3),      # recovery date and time of ae
-              proceduretime1 = parse_date_time(paste(ymd(AE_PDT1), hms(AE_PTM1)), "Ymd HMS", truncated=3)
+              ondate= parse_date_time(paste(ymd(AE_STDT), seconds_to_period(AE_STTM)), "Ymd HMS", truncated = 3), 
+              redate= parse_date_time(paste(ymd(AE_ENDT), seconds_to_period(AE_ENTM)), "Ymd HMS", truncated = 3),      # recovery date and time of ae
+              proceduretime1 = parse_date_time(paste(ymd(AE_PDT1), seconds_to_period(AE_PTM1)), "Ymd HMS", truncated=3)
               ) %>% arrange(ptno)   # sort by ptno
 
 
   #  start date and time of treatement
   
   med <- ex %>% mutate(ptno= as.numeric(CLIENTID), 
-                      meddt= parse_date_time(paste(ymd(EX_STDAT), hms(EX_STTIM)), "Ymd HMS", truncated = 3)) %>%
+                      meddt= parse_date_time(paste(ymd(EX_STDAT), seconds_to_period(EX_STTIM)), "Ymd HMS", truncated = 3)) %>%
               select(ptno, meddt, PERIOD, EX_TRT_C) %>%
               filter(!is.na(meddt))  %>%
               arrange(ptno, meddt) %>% mutate(medper = PERIOD) %>% select(-PERIOD) # remove NAs
@@ -36,6 +37,7 @@ create_aet <- function(ae, ex, included, improv = 99){
     dplyr::filter(ondate < meddt & (!is.na(ondate)))   # select those AEs occurred before dosing
 
   # after (no distinct value, because there might be multiple period)
+  # potential problem when running CA18700 
   after <- inner_join(med, ae, by = "ptno") %>%
     dplyr::filter(ondate >= meddt | is.na(ondate) ) %>%
                mutate(timediff = ondate-meddt)  # create timediff variable
@@ -71,7 +73,7 @@ create_aet <- function(ae, ex, included, improv = 99){
   improve <- final %>% filter(AE_OUT==improv)
   if (nrow(improve) > 0){ # if the improve data is not empty
      improve <- improve %>%
-        mutate(ondate = parse_date_time(paste(ymd(AE_ENDT), hms(AE_ENTM)), "Ymd HMS", truncated = 3)) %>%
+        mutate(ondate = parse_date_time(paste(ymd(AE_ENDT), seconds_to_period(AE_ENTM)), "Ymd HMS", truncated = 3)) %>%
         select(ptno, ondate, AE_TERM)  %>% arrange(ptno, ondate, AE_TERM)
 
       final <- full_join(final, improve, by = c("ptno", "ondate", "AE_TERM"))

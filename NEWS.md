@@ -28,3 +28,4 @@ version 0.1.0
     -   Vital Signs listing
     -   ECG listing
     -   Concomitant medication listing
+    -   Other useful functions
