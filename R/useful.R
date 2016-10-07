@@ -49,13 +49,13 @@ cumcount <- function(vec_c)
 #'
 #' @title label the variables of interest.
 #' @param data  the dataset to be flagged.
-#' @param thresh  a data frame returned by \code{create_threshold()}.
-#' @param included  the dataset included from sas
-#' @param oor     set to be True when flagging if a < c1 or a > c2; set to be FALSE when flagging if c1 < a < c2.
+#' @param thresh  a data frame returned by \code{create_threshold()}
+#' @param prefix how will the flag variable be named (by adding a prefix).
+#' @param oor  is the current variable to be labeled for out of range?
 #' @return aet the data
 #' @export
 #'
-flg_var <- function(data, thresh, prefix = "flg", oor= F){
+flg_var <- function(data, thresh, prefix = "flg", oor= rep(F, nrow(thresh))){
 
   n_var <- nrow(thresh)
 
@@ -66,9 +66,12 @@ flg_var <- function(data, thresh, prefix = "flg", oor= F){
 
 
     # flg only extreme values?
-    if (oor){  # flag if a <  c1 or a > c2
-
-      message("flagging all variables for out of range")
+    if (oor[i]){  # flag if a <  c1 or a > c2
+      ind_1 <- ifelse(thresh[i, 4], "<=", "<")
+      ind_2 <- ifelse(thresh[i, 5], ">=", ">")
+      
+      message(paste("flagging variable", thresh[i, 1],  "if it's", ind_1, 
+                    thresh[i, 2], " or ", ind_2, thresh[i, 3]))
 
       # for lower bound
       if (thresh[i, 4]){
@@ -91,7 +94,13 @@ flg_var <- function(data, thresh, prefix = "flg", oor= F){
 
 
     else {   # flag when c1 < a < c2
-      message("flagging all variables for in beween values")
+      
+      ind_1 <- ifelse(thresh[i, 4], "<=", "<")
+      ind_2 <- ifelse(thresh[i, 5], "<=", "<")
+      
+      
+      message(paste("flagging variable", thresh[i, 1],  "if", thresh[i, 2], ind_1, thresh[i, 1], 
+              ind_2, thresh[i, 3]))
 
       # for lower bound
       if (thresh[i, 4]){
@@ -125,6 +134,7 @@ flg_var <- function(data, thresh, prefix = "flg", oor= F){
 #'
 #' @title remove empty rows and empty columns of a data set.
 #' @param data  the dataset
+#' @param pattern  the pattern to be considered as empty. \code{NA} by default.
 #' @param return_truncated_data Controls the output.
 #' @return a data frame with empty rows and empty columns removed,  or a list containing the following elements.
 #' \item{keep_rows}{a vector of \code{TRUE} (for keeping row) or \code{FALSE} (otherwise)}

@@ -47,28 +47,34 @@ create_aet <- function(ae, ex, included, improv = 99){
   # final1b = unknown times
   # final1c = No AEs
 
-  new <- after %>% arrange(ptno, AE_NO, AE_TERM, ondate, timediff) %>% # order the variables
-         group_by(ptno, AE_NO, AE_TERM, ondate, timediff)
+  new <- after %>% arrange(ptno, AE_NO, AE_TERM, ondate) %>% # order the variables
+         group_by(ptno, AE_NO, AE_TERM, ondate)
   # select the first obs where ondate is not missing
   final1a <- new %>% filter(row_number(ondate)==1 & !(is.na(ondate)))
-  finalb <- new %>% filter(is.na(ondate)) %>% group_by(ptno, AE_NO, AE_TERM)
-  final1b <- finalb %>% filter(row_number(AE_TERM)==1 & (AE_TERM != "NONE"))  # select distinct values
-  final1c <- finalb %>% filter(  !( (row_number(AE_TERM)==1)  &  (AE_TERM != "NONE") )  )
+  finalb <- new %>% filter(is.na(ondate)) %>% arrange(ptno, AE_NO, AE_TERM) %>% 
+                    group_by(ptno, AE_NO, AE_TERM) %>% 
+                    filter(row_number(AE_TERM)==1)  # select distinct values
+  
+  final1b <- finalb %>% filter(AE_TERM != "NONE")  
+  final1c <- finalb %>% filter(  AE_TERM == "NONE")
 
   final <- bind_rows(prior, final1a, final1b, final1c) %>% # efficient way to rbind
           arrange(ptno)
   if ( nrow(final) != nrow(ae)) stop(paste("final has ", nrow(final), "observations while ae has",
                            nrow(ae), "You are losing observations (Duplicates Maybe?)", sep = " " ))
+ # final <- final %>% mutate(duration = as.period(redate - ondate))
+ # final <- final %>% mutate(duration = as.period(interval(as.POSIXct(ondate), as.POSIXct(redate))))
   final$duration = as.period(interval(as.POSIXct(final$ondate), as.POSIXct(final$redate)))
-
+  
   included1 <- included %>% mutate(ptno = as.numeric(PTNO), seq = SEQ) %>% select(ptno, seq)
   final <- left_join(final, included1, by = "ptno")
   ids <- toupper(final$medper) %in% c('PREDOSE','CC','CREATININE CLEARANCE','SCREENING','ALL','UNKNOWN','UNK','SCREEN')
   final <- final[!ids, ] %>% mutate(pernew = as.numeric(substr(medper, 1, 1)),
                                       treat = substr(seq, pernew, pernew) ) %>%
                               arrange(ptno, ondate, AE_TERM)  #sort
-
-  final$t_e <- ifelse(is.na(final$duration), "NO", "YES")
+  
+  final <- final %>% mutate(t_e =  ifelse(is.na(duration), "NO", "YES") )
+  
 
   improve <- final %>% filter(AE_OUT==improv)
   if (nrow(improve) > 0){ # if the improve data is not empty

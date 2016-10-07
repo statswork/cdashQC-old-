@@ -46,8 +46,12 @@ find_race <- function(dm, ex){
   }
 
   # get the treatment information
-  select_ex <- which(names(ex) %in% c("CLIENTID", "EX_TRT_C", "EX_STDAT"))
-  dm <- left_join(dm, ex[, select_ex], by = "CLIENTID")
+  ex1 <- ex %>% select(CLIENTID, EX_TRT_C, EX_STDAT) %>% 
+            arrange(CLIENTID, EX_TRT_C, EX_STDAT) %>% 
+            group_by(CLIENTID, EX_TRT_C) %>%
+            filter(row_number()==1)
+  
+  dm <- left_join(dm, ex1, by = "CLIENTID")
 
   # calculate age by EX_STDAT (start date of treatement)
   span <- time_length(interval(ymd(dm$BRTHDAT), ymd(dm$EX_STDAT)), "year")
@@ -128,7 +132,10 @@ get_summary <- function(var, categorical = F, name  = "race"){
 
 
 dem_summary <- function(dm, ex, vs){
-  vsdm <-find_race(dm, ex) %>% inner_join(weight_height_bmi(vs) , by = "ptno")
+  vsdm_1 <-find_race(dm, ex) %>% arrange(ptno)
+  vsdm_2 <- weight_height_bmi(vs) %>% arrange(ptno)
+  
+    vsdm <- inner_join(vsdm_1, vsdm_2 , by = "ptno")
 
     obs <- 1:nrow(vsdm)
     # for categorical
@@ -144,8 +151,15 @@ dem_summary <- function(dm, ex, vs){
         melt(id ="trait", value.name = "value", variable.name = "Type")%>% arrange(trait)
 
     # combine for output
-   result <- bind_rows(cat_sum, continous_sum)
- 
+    cat_sum <- cat_sum %>% 
+              mutate(value = paste(frequency, " (", round(100*percent, 2), "%)", sep = "")) %>%
+              select(-frequency, -percent) %>%
+              mutate_if(is.factor, as.character)
+    
+    continous_sum <- continous_sum %>% mutate(value = as.character(round(value, 2))) %>%
+                    mutate_if(is.factor, as.character)
+     result <- bind_rows(cat_sum, continous_sum)
+  
 
    return(result)
 }
@@ -164,9 +178,15 @@ dem_summary <- function(dm, ex, vs){
 
 dem_listing <- function(dm, ex, vs){
 
-  vsdm <-find_race(dm, ex) %>% inner_join(weight_height_bmi(vs) , by = "ptno")
+  vsdm_1 <-find_race(dm, ex) %>% arrange(ptno)
+  vsdm_2 <- weight_height_bmi(vs) %>% arrange(ptno)
+  
+  vsdm <- inner_join(vsdm_1, vsdm_2 , by = "ptno")
+  
  
- result <- vsdm %>% select(ptno, BRTHDAT, age, SEX_D, race, ethnic, HEIGHT, WEIGHT, BMI)
+ result <- vsdm %>% 
+   select(ptno, BRTHDAT, age, SEX_D, race, ethnic, HEIGHT, WEIGHT, BMI) %>%
+   arrange(ptno)
 
   return(result)
 }

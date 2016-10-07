@@ -74,5 +74,6 @@ check_vs <- function(vs){
   vs_problem2 <- inner_join(vs_problem %>% arrange(PERIOD, PHOUR, CLIENTID),
                             useful_info %>% arrange(PERIOD, PHOUR, CLIENTID), 
                             by = c("PERIOD", "PHOUR", "CLIENTID"))
+  return(vs_problem2)
 }
 
