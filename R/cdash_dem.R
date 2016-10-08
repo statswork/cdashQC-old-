@@ -14,14 +14,14 @@
 
 find_race <- function(dm, ex){
   sort_col <- sort(names(dm))
-  dm <- data.frame(dm[, sort_col])
+  dm1 <- data.frame(dm[, sort_col])
 
   # combine the race categories, if some one has multiple race attribute
   race_category <- sort(c("WHTE", "BLCK", "AMERIND", "HAWAIIAN", "ASIAN", "OTHER"))
   race_name <- sort(c('White','Black or African American','American Indian/Alaska Native',
                  'Native Hawaiian/Pacific Islander','Asian','Other Race'))
-  col_id <- which(names(dm) %in% race_category)
-  race_matrix <- dm[, col_id]=="YES"
+  col_id <- which(names(dm1) %in% race_category)
+  race_matrix <- dm1[, col_id]=="YES"
   race_sum <- apply(race_matrix, 1, sum)
   race <- c()
   for ( i in 1:nrow(race_matrix)){
@@ -32,17 +32,17 @@ find_race <- function(dm, ex){
       }
       else race[i] <- ""
     }
-  dm$race <- race
+  dm1$race <- race
 
-  dm$ptno <- as.numeric(dm$CLIENTID)
+  dm1$ptno <- as.numeric(dm1$CLIENTID)
 
   # # create ethnicity variable if not already exist
-  if (!( "ETHNIC" %in% (names(dm) ))) {  # not exist
-      id1 <- dm$HISPANIC == "" # obs have empty value of HISPANIC
-      dm$ethnic[!id1] <- ifelse(trimws(dm$HISPANIC[!id1]) %in%
+  if (!( "ETHNIC" %in% (names(dm1) ))) {  # not exist
+      id1 <- dm1$HISPANIC == "" # obs have empty value of HISPANIC
+      dm1$ethnic[!id1] <- ifelse(trimws(dm1$HISPANIC[!id1]) %in%
                                 c("NOT HISPANIC OR LATINO", "NO"),
                     "NOT HISPANIC OR LATINO", "HISPANIC OR LATINO")
-      dm$ethnic[id1] <- ""
+      dm1$ethnic[id1] <- ""
   }
 
   # get the treatment information
@@ -51,14 +51,14 @@ find_race <- function(dm, ex){
             group_by(CLIENTID, EX_TRT_C) %>%
             filter(row_number()==1)
   
-  dm <- left_join(dm, ex1, by = "CLIENTID")
+  dm1 <- left_join(dm1, ex1, by = "CLIENTID")
 
   # calculate age by EX_STDAT (start date of treatement)
-  span <- time_length(interval(ymd(dm$BRTHDAT), ymd(dm$EX_STDAT)), "year")
-  dm$age <- floor(span)
+  span <- time_length(interval(ymd(dm1$BRTHDAT), ymd(dm1$EX_STDAT)), "year")
+  dm1$age <- floor(span)
 
 
-  return(dm)
+  return(dm1)
 }
 
 

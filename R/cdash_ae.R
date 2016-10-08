@@ -3,7 +3,7 @@
 #' @title do what createaet does.
 #' @param ae  the dataset ae read from sas
 #' @param ex  the dataset ex read from sas
-#' @param included  the dataset included from sas
+#' @param included  the dataset included from sas, can be created using \code{new_create_included()}
 #' @param improv the same argument as the sas macro \code{createaet()}
 #' @return aet the data
 #' @export
@@ -99,7 +99,8 @@ create_aet <- function(ae, ex, included, improv = 99){
 #' @param aet  the dataset created by \code{create_aet()}
 #' @return a data frame 
 #' @export
-#'
+#' @seealso \code{\link{create_aet}}
+#' 
 ae1 <- function(aet){
 
   aet_subset <-  aet %>% select(ptno, pern, t_e, AE_TERM, AE_STDT, AE_STTM, AE_ENDT, 
@@ -121,7 +122,8 @@ ae1 <- function(aet){
 #' @param aet the dataset created by \code{create_aet()}
 #' @return a data frame 
 #' @export
-#'
+#' @seealso \code{\link{create_aet}}
+#' 
 ae2 <- function(aet){
 
   aet_subset <- aet %>% select(ptno, pern, EX_TRT_C, AE_TERM, AE_STDT, AE_STTM,
@@ -148,7 +150,8 @@ ae2 <- function(aet){
 #' @param aet  created by \code{create_aet()}
 #' @return a data frame
 #' @export
-#'
+#' @seealso \code{\link{create_aet}}
+#' 
 
 ae3 <- function(aet){
 

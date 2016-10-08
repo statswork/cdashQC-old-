@@ -17,9 +17,10 @@
 #' @title prepare data for lab shift table.
 #' @param lb_cq  the dataset lb_cq read from sas
 #' @param ex  the dataset ex read from sas
-#' @param included  the dataset included from sas (need variable SEQ)
+#' @param included  the dataset created by \code{new_create_included()}. This is the same as the data "included" from sas
 #' @return a data frame
 #' @export
+#' @seealso \code{\link{new_create_included}}
 #'
 
 

@@ -52,9 +52,14 @@ cumcount <- function(vec_c)
 #' @param thresh  a data frame returned by \code{create_threshold()}
 #' @param prefix how will the flag variable be named (by adding a prefix).
 #' @param oor  is the current variable to be labeled for out of range?
-#' @return aet the data
+#' @return the data with variables flagged
 #' @export
-#'
+#' @examples
+#' a <- create_threshold(flagvar = "PR", lower = 150, upper = 200, include_lower = FALSE, include_upper = TRUE,  flg_label = "^")
+#' b <- create_threshold(flagvar = "QTCF",  upper = 430, flg_label = "*", add2existing = TRUE, thresh = a)
+#' data <- data.frame(PR = rnorm(10, 175, 25), QTCF = rnorm(10, 440, 20))
+#' flg_var(data, thresh=b, oor=c(TRUE, FALSE))
+#' 
 flg_var <- function(data, thresh, prefix = "flg", oor= rep(F, nrow(thresh))){
 
   n_var <- nrow(thresh)

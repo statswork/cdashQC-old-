@@ -219,10 +219,10 @@ oor_range <- function(lb_cq){
   #  not as long as the longest lb_orres or range, the width is replaced with the   
   #  longest lb_orres for your lab dataset     
      
-  codes <- read.csv("Y:/development/users/Zhuob01/R-template/data/CODES.csv",stringsAsFactors=F) %>% 
-              filter(lb_testc != "")
-  names(codes) <- toupper(names(codes))
-  codes$LB_TESTC <- as.character(codes$LB_TESTC)
+  # codes <- read.csv("Y:/development/users/Zhuob01/R-template/data/CODES.csv",stringsAsFactors=F) %>% 
+  #             filter(lb_testc != "")
+  # names(codes) <- toupper(names(codes))
+  # codes$LB_TESTC <- as.character(codes$LB_TESTC)
   
   test <- right_join(codes %>% arrange(LB_TESTC), new, by = "LB_TESTC")
   test$COLWIDE <- ifelse(test$lgth > test$COLWIDE |  is.na(test$COLWIDE), test$lgth, test$COLWIDE)
@@ -427,7 +427,7 @@ customized_lab_rept <- function(lb_cq, ex, cat= "UA", var_per_block=5, digit_kee
 #' @param lb_cq  the dataset lb_cq read from sas
 #' @param ex  the dataset ex, used to get treatment information.
 #' @param var_per_block  how many variables to be shown in each block
-#' @param digit_keep  the digit kept in the output. see \code{kable()} for more details
+#' @param digit_keep  the digit kept in the output. see \code{\link[knitr]{kable()}} for more details
 #' @export
 
 

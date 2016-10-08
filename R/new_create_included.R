@@ -94,7 +94,11 @@ create_chkseq <- function(dm, cr){
 
 
 create_dis <- function(ds){
-
+  med <- ex %>% mutate(ptno = as.numeric(CLIENTID),
+                       EX_TRT_C = substr(EX_TRT_C, 4, 4),   # get the treatment lable
+                       pern = as.numeric(gsub("A|B|C|D|E|F", "", PERIOD)) # remove A or B or C, ect.  equivalent to compress() in SAS
+                       )
+  totper <- length(unique(med$pern))
   
   dis <- ds %>% mutate(ptno = as.numeric(CLIENTID))
   ds_ans_exist <- any(names(dis) %in% "DS_ANS")
